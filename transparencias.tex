@@ -67,10 +67,6 @@
   \titlepage
 \end{frame}
 
-\begin{frame}{Contenidos}
-  \tableofcontents[hideallsubsections]
-\end{frame}
-
 \begin{frame}{Antes de empezar\ldots}
   \begin{itemize}
   \item Estas transparencias están basadas en las de Roberto García
@@ -84,6 +80,10 @@
   \vfill
   \hfill\tiny{(Sí, en un repositorio Git. ¿Por qué me miráis así?)}
 
+\end{frame}
+
+\begin{frame}{Contenidos}
+  \tableofcontents[hideallsubsections]
 \end{frame}
 
 \section{Introducción}
@@ -810,8 +810,7 @@
     \begin{itemize}
     \item Se puede proporcionar un mensaje mediante \inlinecmd{-m}
     \item De lo contrario, se abrirá el editor por omisión
-    \item Se necesita una conexión de red, para enviar los cambios al
-      servidor
+    \item Se necesita una conexión de red para enviar los cambios
     \item Los cambios son atómicos: si se corta la conexión a la
       mitad, es como si no hubiera pasado nada
     \end{itemize}
@@ -923,9 +922,9 @@
 
 \end{frame}
 
-\runcommand{rm -rf svnRamas}
+\runcommand{rm -rf svnRamas ramas}
 
-\begin{frame}{Ramas y etiquetas en Subversion}
+\begin{frame}{Ramas y etiquetas en Subversion: estructura básica}
 
   \begin{block}{Implementación}
     \begin{itemize}
@@ -940,19 +939,172 @@
 
   \runandshowcommand{mkdir svnRamas; svnadmin create svnRamas}
   \showcommand{./do-checkout.sh svnRamas ramas}
-  \orden{cd svnRamas}
+  \orden{cd ramas}
   \orden{svn mkdir trunk branches tags}
-  \showcommand{cd svnRamas; svn mkdir trunk branches tags}
-
+  \showcommand{cd ramas; svn mkdir trunk branches tags}
+  \orden{svn ci -m "Creado estructura de rama principal/ramas/etiquetas"}
+  \showcommand{cd ramas; svn ci -m "Creado estructura de rama principal/ramas/etiquetas"}
 
 \end{frame}
 
+\begin{frame}{Ramas y etiquetas en Subversion: creación de etiquetas}
+
+  Sólo tenemos que hacer una simple copia (mejor con URL):
+
+  \vspace{1em}
+
+  \showcommand{./do-url-copy.sh svnRamas trunk tags/1.0}
+
+\end{frame}
+
+\begin{frame}{Ramas y etiquetas en Subversion: trabajar en rama principal}
+
+  Cambiamos a \inlinecmd{trunk} mediante \inlinecmd{svn switch}:
+
+  \vspace{1em}
+
+  \showcommand{cd ramas; ../do-switch.sh svnRamas trunk}
+  \orden{echo "Hola" > f.txt}
+  \orden{svn add f.txt} 
+  \showcommand{cd ramas; echo "Hola" > f.txt; svn add f.txt}
+  \orden{svn ci -m "Primer cambio en rama principal"}
+  \showcommand{cd ramas; svn ci -m "Primer cambio en rama principal"} 
+
+\end{frame}
+
+\begin{frame}{Ramas en Subversion: uso de una rama aparte (I)}
+
+  Abrir una rama usa \inlinecmd{svn cp} con URL origen y destino:
+
+  \vspace{1em}
+
+  \showcommand{./do-url-copy.sh svnRamas trunk branches/inestable}
+
+  \vfill
+
+  Trabajar en una rama sólo requiere cambiar a ella:
+
+  \vspace{1em}
+
+  \showcommand{cd ramas; ../do-switch.sh svnRamas branches/inestable}
+  \orden{echo "Nuevo" > nuevo.txt; svn add nuevo.txt}
+  \showcommand{cd ramas; echo "Nuevo" > nuevo.txt; svn add nuevo.txt}
+  \orden{svn ci -m "Primer cambio inestable"}
+  \showcommand{cd ramas; svn ci -m "Primer cambio inestable"}
+
+\end{frame}
+
+\begin{frame}{Ramas en Subversion: uso de una rama aparte (II)}
+  \begin{block}{Traer cambios a la rama actual: \inlinecmd{svn merge origen}}
+    \begin{itemize}
+    \item Antes había que poner el rango de revisiones de la rama
+      origen a aplicar mediante \inlinecmd{-r inicio:fin}
+    \item Desde SVN 1.5, el rango se puede calcular automáticamente si
+      se usa una URL en \inlinecmd{origen}
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \showcommand{cd ramas; ../do-switch.sh svnRamas trunk}
+  \showcommand{cd ramas; ../do-merge.sh svnRamas branches/inestable}
+  \orden{svn ci -m "Integrado cambios de branches/inestable en trunk"}
+  \showcommand{cd ramas; svn ci -m "Integrado cambios de branches/inestable en trunk"}
+
+\end{frame}
 
 \subsection{Exportación}
 
+\begin{frame}{Exportar la copia de trabajo a un directorio aparte}
+
+  \begin{block}{Orden: \inlinecmd{svn export origen destino}}
+    \begin{itemize}
+    \item Copia los ficheros bajo control de versiones a
+      \inlinecmd{destino}
+    \item No copia los \inlinecmd{.svn} ni ficheros fuera de control
+      de versiones
+    \item Útil para generar distribuciones limpias de cosas de SVN
+    \item Puede usarse una URL (por ejemplo, la de una etiqueta)
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \orden{ls -a .}
+  \showcommand{cd ramas; ls -C --color -a .}
+  \orden{svn export . /tmp/ramas-HEAD}
+  \showcommand{cd ramas; rm -rf /tmp/ramas-HEAD; svn export . /tmp/ramas-HEAD}
+  \runandshowcommand{ls -a -C --color /tmp/ramas-HEAD}
+
+\end{frame}
+
 \subsection{Metadatos}
 
+\begin{frame}{Propiedades de ficheros y directorios}
+
+  \begin{block}{Concepto general}
+    \begin{itemize}
+    \item SVN puede asociar \emph{propiedades} a ficheros y directorios
+    \item También están bajo control de versiones
+    \item Se pueden cambiar con las órdenes:
+      \begin{description}[svn ps nombre valor ruta]
+      \item[svn pg nombre ruta] Obtiene el valor de una propiedad
+      \item[svn ps nombre valor ruta] Cambia el valor de una propiedad
+      \item[svn pe nombre ruta] Edita el valor de una propiedad
+      \item[svn pl ruta] Lista las propiedades de una ruta
+      \end{description}
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Ejemplos útiles}
+    \begin{description}[svn:executable]
+    \item[svn:ignore]     Ignora en \inlinecmd{status} y \inlinecmd{add} una serie de ficheros
+    \item[svn:mime-type]  Tipo MIME del fichero (para Apache)
+    \item[svn:executable] Indica si es ejecutable en sistemas UNIX
+    \end{description}
+  \end{block}
+
+\end{frame}
+
+\begin{frame}{Ejemplo con svn:ignore}
+
+  \orden{touch foo.tmp}
+  \orden{svn st}
+  \showcommand{cd ramas; touch foo.tmp; svn st}
+  \orden{svn ps svn:ignore foo.tmp .}
+  \showcommand{cd ramas; svn ps svn:ignore foo.tmp .}
+  \orden{svn st}
+  \showcommand{cd ramas; svn st}
+  \orden{svn ci -m "No me interesa foo.tmp"}
+  \showcommand{cd ramas; svn ci -m "No me interesan los .tmp"}
+
+\end{frame}
+
 \appendix
+
+\begin{frame}{Recursos útiles}
+
+  \begin{thebibliography}{99}
+    \beamertemplatebookbibitems
+    \bibitem{RedBook} B. Collins-Sussman, B. W. Fitzpatrick y C. M. Pilato.
+      \newblock Control de versiones con Subversion.
+      \newblock \url{http://svnbook.red-bean.com}
+
+    \beamertemplatearticlebibitems
+    \bibitem{MT} B. Collins-Sussman.
+      \newblock SVN 1.5 merge tracking in a nutshell.
+      \newblock \url{http://blog.red-bean.com/sussman/?p=92}
+
+    \bibitem{Cheatsheet} D. Child.
+      \newblock Subversion Cheat Shett.
+      \newblock \url{http://www.addedbytes.com/cheat-sheets/subversion-cheat-sheet/}
+
+    \bibitem{TSVN} Tigris.org.
+      \newblock TortoiseSVN: interfaz gráfica para SVN en Windows.
+      \newblock \url{http://tortoisesvn.tigris.org}
+  \end{thebibliography}
+  
+\end{frame}
 
 \begin{frame}{Fin de la presentación}
   \begin{center}
