@@ -102,7 +102,7 @@
   \end{block}
 
   \begin{block}{SCV: todo ventajas a cambio de alguna disciplina}
-    \begin{itemize} 
+    \begin{itemize}
     \item Llevamos un historial de los cambios
     \item Podemos ir trabajando en varias cosas a la vez
     \item Podemos colaborar con otros
@@ -252,7 +252,7 @@
         (svnserve) edge[in=0,out=270] (repo);
     \end{tikzpicture}
   \end{center}
-  
+
 \end{frame}
 
 \begin{frame}{¿Cómo funciona un repositorio?}
@@ -285,7 +285,7 @@
     \emph{revisión} en el servidor.
 
     \onslide<3>
-    \centering  
+    \centering
     El desarrollador A manda sus cambios al servidor. El servidor los
     registra como una nueva revisión.
 
@@ -352,7 +352,7 @@
       María sobreescribe el trabajo de José. ¿Cómo podemos evitarlo?
     \end{overprint}
   \end{center}
-  
+
 \end{frame}
 
 \begin{frame}{Solución 1: Bloquear-Modificar-Desbloquear}
@@ -593,7 +593,7 @@
   \end{block}
 
   \runandshowcommand{svn checkout svnEjemplo ejemplo}
-  \showcommand{./do-checkout.sh ejemplo}
+  \showcommand{./do-checkout.sh svnEjemplo ejemplo}
 
 \end{frame}
 
@@ -791,7 +791,7 @@
 \begin{frame}{Resolver conflictos}
 
   \orden{cd ..}
-  \showcommand{./do-checkout.sh ejemplo-conflicto}
+  \showcommand{./do-checkout.sh svnEjemplo ejemplo-conflicto}
   \orden{echo "hacemos un cambio" >> ejemplo-conflicto/g.txt}
   \showcommand{echo "hacemos un cambio" >> ejemplo-conflicto/g.txt}
   \orden{echo "hacemos otro cambio" >> ejemplo/g.txt}
@@ -900,6 +900,53 @@
 \section{Uso avanzado}
 
 \subsection{Ramas y etiquetas}
+
+\begin{frame}{Conceptos de ramas y etiquetas}
+
+  \begin{block}{Ramas: líneas de desarrollo alternativas}
+    \begin{itemize}
+    \item Para realizar cambios significativos sin molestar a los
+      demás, para después traerlos a la rama principal (\emph{trunk})
+    \item Para realizar correcciones sobre versiones antes publicadas,
+      sin mezclarlas con las novedades de la sigiente versión
+    \item Para mantener una versión estable y otra experimental
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{Etiquetas}
+    \begin{itemize}
+    \item Nos permiten darle un nombre a una revisión: en vez de
+      ``revisión 238'', podemos pedir la ``versión 1.0''
+    \item Son una instantánea del estado del repositorio
+    \end{itemize}
+  \end{block}
+
+\end{frame}
+
+\runcommand{rm -rf svnRamas}
+
+\begin{frame}{Ramas y etiquetas en Subversion}
+
+  \begin{block}{Implementación}
+    \begin{itemize}
+    \item Directorios bajo una estructura estándar
+    \item Aprovechan el hecho de que en Subversion, copiar con
+      \inlinecmd{svn cp} tiene coste $O(1)$ en tiempo y espacio en el
+      repositorio
+    \end{itemize}
+  \end{block}
+
+  \vfill
+
+  \runandshowcommand{mkdir svnRamas; svnadmin create svnRamas}
+  \showcommand{./do-checkout.sh svnRamas ramas}
+  \orden{cd svnRamas}
+  \orden{svn mkdir trunk branches tags}
+  \showcommand{cd svnRamas; svn mkdir trunk branches tags}
+
+
+\end{frame}
+
 
 \subsection{Exportación}
 
