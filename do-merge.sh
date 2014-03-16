@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Do not print paths on chdir()
+unset CDPATH
+
 SVN_REPO_BASENAME=$1
 REPO_PATH=$2
 

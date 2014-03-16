@@ -19,7 +19,7 @@
 
 \title[Introducción a SVN]{Introducción al Sistema de Control de Versiones Centralizado SVN}
 \author{Antonio García Domínguez}
-\date{15 de noviembre de 2011}
+\date{17 de marzo de 2014}
 \institute{Universidad de Cádiz \\\vspace{2em} \includegraphics{cc-by-sa}}
 
 \AtBeginSection[]
@@ -77,8 +77,8 @@
     \url{http://github.com/bluezio/seminario-svn}.
   \end{itemize}
 
-  \vfill
-  \hfill\tiny{(Sí, en un repositorio Git. ¿Por qué me miráis así?)}
+  % \vfill
+  % \hfill\tiny{(Sí, en un repositorio Git. ¿Por qué me miráis así?)}
 
 \end{frame}
 
@@ -154,7 +154,7 @@
     \item[2004] SVN 1.0.0
     \item[2009] Entra en \emph{Apache Incubator}
     \item[2010] Se convierte en un proyecto de primer nivel de Apache
-    \item[2011] 20 octubre: SVN 1.7.1
+    \item[2014] 20 febrero: SVN 1.8.8
     \end{description}
   \end{block}
 
@@ -174,7 +174,7 @@
 
     \small Porcentajes de proyectos en Ohloh según tipo de
     repositorio. \url{http://www.ohloh.net/repositories/compare},
-    2011-11-13.
+    2014-03-16.
   \end{figure}
 
 \end{frame}
@@ -642,8 +642,7 @@
     \item Si es un directorio, añade todo lo que está dentro, a menos
       que se use \inlinecmd{svn add -N directorio}
     \item Código corto de estado: ``A''
-    \item Vamos a enviar los cambios con \inlinecmd{svn commit}, para
-      enseñar la siguiente orden
+    \item Vamos a enviar los cambios con \inlinecmd{svn commit}
     \end{itemize}
   \end{block}
 
@@ -681,8 +680,7 @@
 \begin{frame}{Realizar cambios: copiar ficheros y directorios}
 
   \begin{block}{Orden: \inlinecmd{svn copy origen destino} o \inlinecmd{svn cp origen destino}}
-    Es necesario copiar de esta forma para que el destino comparta el
-    historial del origen hasta ahora.
+    Copian tanto los datos del fichero como su historial.
   \end{block}
 
   \vfill
@@ -702,8 +700,7 @@
 \begin{frame}{Realizar cambios: mover ficheros y directorios}
 
   \begin{block}{Orden: \inlinecmd{svn move origen destino} o \inlinecmd{svn mv origen destino}}
-    Esta orden conserva el historial, aunque cambie la ruta del
-    fichero o el directorio.
+    Mueve tanto los datos del fichero como su historial.
   \end{block}
 
   \vfill
@@ -769,10 +766,11 @@
 
 \begin{frame}{Deshacer cambios}
   \begin{block}{Orden: \inlinecmd{svn revert} (recursivo: \inlinecmd{-R})}
-    \begin{itemize}
-    \item Deshace los cambios realizados sobre la última revisión
-    \item Usuarios de Git: ¡no os confundáis con \inlinecmd{git revert}!
-    \end{itemize}
+    % \begin{itemize}
+    % \item
+      Deshace los cambios realizados sobre la última revisión.
+    % \item Usuarios de Git: ¡no os confundáis con \inlinecmd{git revert}!
+    % \end{itemize}
   \end{block}
 
   \vfill
@@ -938,12 +936,7 @@
   \vfill
 
   \runandshowcommand{mkdir svnRamas; svnadmin create svnRamas}
-  \showcommand{./do-checkout.sh svnRamas ramas}
-  \orden{cd ramas}
-  \orden{svn mkdir trunk branches tags}
-  \showcommand{cd ramas; svn mkdir trunk branches tags}
-  \orden{svn ci -m "Creado estructura de rama principal/ramas/etiquetas"}
-  \showcommand{cd ramas; svn ci -m "Creado estructura de rama principal/ramas/etiquetas"}
+  \showcommand{./do-branches.sh svnRamas}
 
 \end{frame}
 
@@ -959,11 +952,12 @@
 
 \begin{frame}{Ramas y etiquetas en Subversion: trabajar en rama principal}
 
-  Cambiamos a \inlinecmd{trunk} mediante \inlinecmd{svn switch}:
+  Creamos una copia de trabajo sobre \inlinecmd{trunk}:
 
   \vspace{1em}
 
-  \showcommand{cd ramas; ../do-switch.sh svnRamas trunk}
+  \showcommand{./do-checkout.sh svnRamas/trunk ramas}
+  \orden{cd ramas}
   \orden{echo "Hola" > f.txt}
   \orden{svn add f.txt} 
   \showcommand{cd ramas; echo "Hola" > f.txt; svn add f.txt}
@@ -1096,12 +1090,12 @@
       \newblock \url{http://blog.red-bean.com/sussman/?p=92}
 
     \bibitem{Cheatsheet} D. Child.
-      \newblock Subversion Cheat Shett.
+      \newblock Subversion Cheat Sheet.
       \newblock \url{http://www.addedbytes.com/cheat-sheets/subversion-cheat-sheet/}
 
     \bibitem{TSVN} Tigris.org.
       \newblock TortoiseSVN: interfaz gráfica para SVN en Windows.
-      \newblock \url{http://tortoisesvn.tigris.org}
+      \newblock \url{http://tortoisesvn.net/}
   \end{thebibliography}
   
 \end{frame}
